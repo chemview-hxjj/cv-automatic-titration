@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>调试</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/style.css') }}">
+</head>
+<body>
+    <div class="config-container">
+        <div class="config-section">
+            <div class="config-row">
+                <div class="config-label">启用mask</div>
+                <select class="config-input" id="mask">
+                    <option value="True">是</option>
+                    <option value="False">否</option>
+                </select>
+            </div>
+            <div class="config-row">
+                <div class="config-label">需要重载</div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <!--<button class="config-button" id="cancel-button">取消</button>-->
+            <button class="config-button" id="ok-button">应用</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载时从服务器获取当前配置
+            loadCurrentConfig();
+            
+            // 取消按钮点击事件
+            //document.getElementById('cancel-button').addEventListener('click', function() {
+                //window.close();
+            //});
+            
+            // 确定按钮点击事件
+            document.getElementById('ok-button').addEventListener('click', function() {
+                const mask = document.getElementById('mask').value === 'True';
+                
+                // 保存配置到服务器
+                fetch('/api/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'usemask': mask
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.close();
+                    } else {
+                        alert('保存失败: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('保存失败: ' + error);
+                });
+            });
+        });
+        
+        function loadCurrentConfig() {
+            // 从服务器获取当前配置
+            fetch('/api/get_config')
+                .then(response => response.json())
+                .then(config => {
+                    if (config.usemask !== undefined) {
+                        document.getElementById('mask').value = config.usemask ? 'True' : 'False';
+                    }
+                })
+                .catch(error => {
+                    console.log('获取配置失败:', error);
+                });
+        }
+    </script>
+</body>
+</html>

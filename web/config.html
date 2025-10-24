@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>硬件配置</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/style.css') }}">
+</head>
+<body>
+    <div class="config-container">
+        <div class="config-section">
+            <div class="config-row">
+                <div class="config-label">摄像机编号：</div>
+                <input type="text" class="config-input" id="camera-id" value="">
+            </div>
+            <div class="config-row">
+                <div class="config-label">串口号：</div>
+                <input type="text" class="config-input" id="serial-port" value="">
+            </div>
+            <div class="config-row">
+                <div class="config-label">需要重载</div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <!--<button class="config-button" id="cancel-button">取消</button>-->
+            <button class="config-button" id="ok-button">应用</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载时从服务器获取当前配置
+            loadCurrentConfig();
+            
+            // 取消按钮点击事件
+            //document.getElementById('cancel-button').addEventListener('click', function() {
+                //window.close();
+            //});
+            
+            // 确定按钮点击事件
+            document.getElementById('ok-button').addEventListener('click', function() {
+                const cameraId = parseInt(document.getElementById('camera-id').value);
+                const serialPort = document.getElementById('serial-port').value;
+                
+                if (isNaN(cameraId)) {
+                    alert('摄像机编号必须是数字');
+                    return;
+                }
+                
+                // 保存配置到服务器
+                fetch('/api/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'cap_num': cameraId,
+                        'port': serialPort
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.close();
+                    } else {
+                        alert('保存失败: ' + (data.error || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    alert('保存失败: ' + error);
+                });
+            });
+        });
+        
+        function loadCurrentConfig() {
+            console.log('正在加载当前配置...');
+            
+            // 从服务器获取当前配置
+            fetch('/api/get_config')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.json();
+                })
+                .then(config => {
+                    console.log('获取到的配置:', config);
+                    
+                    if (config.error) {
+                        console.error('获取配置错误:', config.error);
+                        return;
+                    }
+                    
+                    if (config.cap_num !== undefined) {
+                        document.getElementById('camera-id').value = config.cap_num;
+                        console.log('设置摄像机编号:', config.cap_num);
+                    }
+                    if (config.port) {
+                        document.getElementById('serial-port').value = config.port;
+                        console.log('设置串口号:', config.port);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取配置失败:', error);
+                    alert('无法加载当前配置: ' + error.message);
+                });
+        }
+    </script>
+</body>
+</html>

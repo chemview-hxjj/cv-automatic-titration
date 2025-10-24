@@ -1,0 +1,401 @@
+/* 重置样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+/* 通用样式 */
+body {
+    background-color: #f0f0f0;
+    padding: 0;
+}
+
+/* 主页面样式 */
+.main-body {
+    overflow: hidden;
+}
+
+.dialog-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    padding: 5px;
+}
+
+/* 菜单栏容器 */
+.menu-bar {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #a0a0a0;
+    display: flex;
+    height: 25px;
+    padding: 0 5px;
+    width: 100%;
+    margin: 0;
+}
+
+/* 主菜单项 */
+.menu-item {
+    position: relative;
+    padding: 3px 12px;
+    font-size: 13px;
+    color: #000;
+    cursor: default;
+    transition: background-color 0.1s;
+    user-select: none;
+    border: none;
+}
+
+.menu-item:hover {
+    background-color: #e1f3ff;
+    padding: 3px 12px;
+}
+
+.menu-item.active {
+    background-color: #cce8ff;
+    padding: 3px 12px;
+}
+
+/* 下拉菜单 */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #f9f9f9;
+    border: 1px solid #a0a0a0;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    z-index: 1000;
+    display: none;
+}
+
+.menu-item.active .dropdown-menu {
+    display: block;
+}
+
+/* 下拉菜单项 */
+.dropdown-item {
+    padding: 5px 20px 5px 30px;
+    font-size: 13px;
+    color: #000;
+    cursor: default;
+    position: relative;
+    transition: background-color 0.1s;
+}
+
+.dropdown-item:hover {
+    background-color: #316ac5;
+    color: white;
+}
+
+/* 分隔线 */
+.menu-separator {
+    height: 1px;
+    background-color: #d0d0d0;
+    margin: 4px 10px;
+}
+
+/* 快捷键样式 */
+.shortcut {
+    position: absolute;
+    right: 10px;
+    color: #808080;
+}
+
+.dropdown-item:hover .shortcut {
+    color: #c0c0c0;
+}
+
+/* 修改内容区域布局 */
+.content {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    height: calc(100vh - 50px);
+}
+
+/* 左侧4:3视频容器 */
+.video-container {
+    width: 60%;
+    max-width: 640px;
+    aspect-ratio: 4/3;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+}
+
+.video-placeholder {
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.camera-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #fff;
+    font-size: 14px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 2px 8px;
+}
+
+/* 右侧信息面板 */
+.info-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+}
+
+.info-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.info-value {
+    color: #666;
+    font-family: monospace;
+}
+
+#system-time {
+    color: #0066cc;
+    font-weight: bold;
+}
+
+/* 启动按钮 */
+.start-button-container {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.start-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-button:hover {
+    background-color: #218838;
+}
+
+.start-button:active {
+    background-color: #1e7e34;
+}
+
+/* 状态栏样式 */
+.status-bar {
+    background-color: #f0f0f0;
+    border-top: 1px solid #a0a0a0;
+    height: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 12px;
+    color: #000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.status-message {
+    flex: 1;
+}
+
+.status-info {
+    display: flex;
+    gap: 15px;
+}
+
+.status-item {
+    padding: 0 5px;
+}
+
+/* 对话框容器样式 */
+.dialog-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #f0f0f0;
+    padding: 10px;
+}
+
+/* 关于页面特定样式 */
+.about-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #f0f0f0;
+    padding: 10px;
+}
+
+.app-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    text-align: center;
+}
+
+.app-version {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #666;
+    text-align: center;
+}
+
+.info-section {
+    width: 100%;
+    margin-top: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.info-label {
+    width: 80px;
+    font-weight: bold;
+    color: #333;
+}
+
+.info-value {
+    flex: 1;
+    color: #555;
+}
+
+.link {
+    color: #0066cc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.button-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ok-button {
+    background-color: #e0e0e0;
+    border: 1px solid #aaa;
+    padding: 3px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 60px;
+    margin-left: auto;
+}
+
+.ok-button:hover {
+    background-color: #d0d0d0;
+}
+
+.config-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #f0f0f0;
+    padding: 10px;
+}
+
+
+.config-section {
+    width: 100%;
+    margin-top: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.config-row {
+    display: flex;
+    margin-bottom: 15px;
+    font-size: 14px;
+    align-items: center;
+}
+
+.config-label {
+    width: 100px;
+    font-weight: bold;
+    color: #333;
+}
+
+.config-input {
+    flex: 1;
+    height: 24px;
+    padding: 2px 6px;
+    border: 1px solid #a0a0a0;
+    font-size: 13px;
+    background-color: white;
+}
+
+.config-input:focus {
+    outline: none;
+    border-color: #316ac5;
+}
+
+.button-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.config-button {
+    background-color: #e0e0e0;
+    border: 1px solid #aaa;
+    padding: 3px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.config-button:hover {
+    background-color: #d0d0d0;
+}
+
+/* 大模型预测样式 */
+.ai-prediction-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.ai-color-block {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #9CA3AF;
+}
+
+.ai-prediction-text {
+    font-size: 14px;
+    color: #6B7280;
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>实验设置</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/style.css') }}">
+</head>
+<body>
+    <div class="config-container">
+        <div class="config-section">
+            <div class="config-row">
+                <div class="config-label">滴定速度：</div>
+                <input type="text" class="config-input" id="rate" value="">
+            </div>
+            <div class="config-row">
+                <div class="config-label">颜色阈值：</div>
+                <input type="text" class="config-input" id="threshold" value="">
+            </div>
+            <div class="config-row">
+                <div class="config-label">阈值倍率：</div>
+                <input type="text" class="config-input" id="threshold_times" value="">
+            </div>
+            <div class="config-row">
+                <div class="config-label">需要重载</div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <!--<button class="config-button" id="cancel-button">取消</button>-->
+            <button class="config-button" id="ok-button">应用</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载时从服务器获取当前配置
+            loadCurrentConfig();
+            
+            // 取消按钮点击事件
+            //document.getElementById('cancel-button').addEventListener('click', function() {
+                //window.close();
+            //});
+            
+            // 确定按钮点击事件
+            document.getElementById('ok-button').addEventListener('click', function() {
+                const rate = document.getElementById('rate').value;
+                const threshold = parseFloat(document.getElementById('threshold').value);
+                const threshold_times = parseFloat(document.getElementById('threshold_times').value);
+                
+                // 保存配置到服务器
+                fetch('/api/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'rate': rate,
+                        'threshold': threshold,
+                        'threshold_times': threshold_times
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.close();
+                    } else {
+                        alert('保存失败: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('保存失败: ' + error);
+                });
+            });
+        });
+        
+        function loadCurrentConfig() {
+            // 从服务器获取当前配置
+            fetch('/api/get_config')
+                .then(response => response.json())
+                .then(config => {
+                    if (config.rate) {
+                        document.getElementById('rate').value = config.rate;
+                    }
+                    if (config.threshold !== undefined) {
+                        document.getElementById('threshold').value = config.threshold;
+                    }
+                    if (config.threshold_times !== undefined) {
+                        document.getElementById('threshold_times').value = config.threshold_times;
+                    }
+                })
+                .catch(error => {
+                    console.log('获取配置失败:', error);
+                });
+        }
+    </script>
+</body>
+</html>

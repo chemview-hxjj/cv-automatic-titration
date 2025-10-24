@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>化学笺集自动化滴定项目</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/style.css') }}">
+</head>
+<body>
+    <div class="menu-bar">
+        <div class="menu-item" id="file-menu">
+            文件
+            <div class="dropdown-menu">
+                <div class="dropdown-item" id="menu-expconfig">实验设置...</div>
+            </div>
+        </div>
+        
+        <div class="menu-item" id="settings-menu">
+            设置
+            <div class="dropdown-menu">
+                <div class="dropdown-item" id="menu-hwconfig">硬件配置</div>
+                <div class="dropdown-item" id="menu-debug">调试...</div>
+                <div class="dropdown-item" id="menu-reload">重载</div>
+            </div>
+        </div>
+        
+        <div class="menu-item" id="control-menu">
+            控制
+            <div class="dropdown-menu">
+                <div class="dropdown-item" id="menu-rinse">润洗</div>
+                <div class="dropdown-item" id="menu-start">启动滴定过程</div>
+                <div class="dropdown-item" id="menu-stop">停止</div>
+            </div>
+        </div>
+
+        <div class="menu-item" id="control-menu">
+            工具
+            <div class="dropdown-menu">
+                <div class="dropdown-item" id="menu-predict">预测终点颜色</div>
+                <div class="dropdown-item" id="log-console">日志控制台</div>
+            </div>
+        </div>
+
+        <div class="menu-item" id="about-menu">
+            关于
+            <div class="dropdown-menu">
+                <div class="dropdown-item" id="menu-help">帮助</div>
+                <div class="menu-separator"></div>
+                <div class="dropdown-item" id="menu-about">关于</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="content">
+        <!-- 左侧视频容器 -->
+        <div class="video-container">
+            <img src="{{ url_for('video_feed') }}" class="video-placeholder" alt="摄像机画面">
+            <div class="camera-info">摄像机</div>
+        </div>
+        
+        <!-- 右侧信息面板 -->
+        <div class="info-panel">
+            <div class="info-item">
+                <div class="info-label">启动时间</div>
+                <div class="info-value" id="pump-time">未启动</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">消耗体积</div>
+                <div class="info-value" id="liquid-volume">0.00 mL</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">系统时间</div>
+                <div class="info-value" id="system-time">--:--:--</div>
+            </div>
+
+            <!-- 大模型预测状态显示 -->
+            <div class="info-item">
+                <div class="info-label">大模型预测</div>
+                <div class="ai-prediction-container">
+                    <div class="ai-color-block" id="ai-color-block"></div>
+                    <div class="ai-prediction-text" id="ai-predict-text">未进行预测</div>
+                </div>
+            </div>
+            
+            <div class="start-button-container">
+                <button class="start-button" id="start-button">启动滴定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="status-message">等待</div>
+        <div class="status-info">
+            <div class="status-item">滴定未开始</div>
+        </div>
+    </div>
+
+    <script>
+        // 滴定状态
+        let isTitrationRunning = false;
+        let statusUpdateInterval = null;
+
+        // 菜单交互逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            let activeMenu = null;
+            
+            // 点击菜单项显示下拉菜单
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    if (activeMenu === this) {
+                        this.classList.remove('active');
+                        activeMenu = null;
+                    } else {
+                        if (activeMenu) {
+                            activeMenu.classList.remove('active');
+                        }
+                        this.classList.add('active');
+                        activeMenu = this;
+                    }
+                });
+            });
+            
+            // 点击页面其他区域关闭菜单
+            document.addEventListener('click', function() {
+                if (activeMenu) {
+                    activeMenu.classList.remove('active');
+                    activeMenu = null;
+                }
+            });
+            
+            // 为下拉菜单项添加点击事件
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    if (this.id === 'menu-about') {
+                        openAboutWindow();
+                    }
+                    else if (this.id === 'menu-start') {
+                        startTitration();
+                    }
+                    else if (this.id === 'menu-stop') {
+                        stopTitration();
+                    }
+                    else if (this.id === 'menu-rinse') {
+                        rinse();
+                    }
+                    else if (this.id === 'menu-predict') {
+                        predict();
+                    }
+                    else if (this.id === 'log-console') {
+                        openLogConsole();
+                    }
+                    else if (this.id === 'menu-hwconfig') {
+                        openHardwareConfig();
+                    }
+                    else if (this.id === 'menu-expconfig') {
+                        openExperimentConfig();
+                    }
+                    else if (this.id === 'menu-debug') {
+                        openDebugConfig();
+                    }
+                    else if (this.id === 'menu-reload') {
+                        reload();
+                    }
+                    else if (this.id === 'menu-help') {
+                        openHelp();
+                    }
+                    
+                    if (activeMenu) {
+                        activeMenu.classList.remove('active');
+                        activeMenu = null;
+                    }
+                });
+            });
+
+            // 系统时间更新
+            function updateSystemTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-CN');
+                document.getElementById('system-time').textContent = timeString;
+            }
+            
+            // 更新状态信息
+            function updateStatus() {
+                fetch('/api/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector('.status-message').textContent = data.message;
+                        document.getElementById('pump-time').textContent = data.time;
+                        document.getElementById('liquid-volume').textContent = data.volume;
+                        
+                        // 更新大模型预测色块
+                        const colorBlock = document.getElementById('ai-color-block');
+                        const predictionText = document.querySelector('.ai-prediction-text');
+                        
+                        if (data.predict_color) {
+                            colorBlock.style.backgroundColor = data.predict_color;
+                            predictionText.textContent = data.predict_color;
+                        } else {
+                            colorBlock.style.backgroundColor = '#9CA3AF';
+                            predictionText.textContent = '未进行预测';
+                        }
+                        
+                        // 更新滴定状态显示
+                        if (data.endpoint) {
+                            document.querySelector('.status-item').textContent = '终点判定条件';
+                        } else if (data.running) {
+                            document.querySelector('.status-item').textContent = '正在滴定';
+                        } else {
+                            document.querySelector('.status-item').textContent = '滴定未开始';
+                        }
+                        
+                        // 更新按钮状态
+                        if (data.running) {
+                            document.getElementById('start-button').textContent = '停止滴定';
+                            document.getElementById('start-button').style.backgroundColor = '#dc3545';
+                            isTitrationRunning = true;
+                        } else {
+                            document.getElementById('start-button').textContent = '启动滴定';
+                            document.getElementById('start-button').style.backgroundColor = '#28a745';
+                            isTitrationRunning = false;
+                        }
+                    });
+            }
+            
+            // 启动滴定函数
+            function startTitration() {
+                fetch('/api/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                isTitrationRunning = true;
+                updateStatus();
+            }
+            
+            // 停止滴定函数
+            function stopTitration() {
+                fetch('/api/stop', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                isTitrationRunning = false;
+                updateStatus();
+            }
+            
+            // 打开配置窗口 - 使用webview创建新窗口
+            function openHardwareConfig() {
+                fetch('/api/open_window/config/硬件配置/400/300');
+            }
+            
+            function openExperimentConfig() {
+                fetch('/api/open_window/exp/实验设置/400/340');
+            }
+            
+            function openDebugConfig() {
+                fetch('/api/open_window/debug/调试/400/260');
+            }
+
+            function reload() {
+                fetch('/api/reload');
+            }
+
+            function rinse() {
+                fetch('/api/rinse');
+            }
+
+            function predict() {
+                fetch('/api/open_window/predict/大模型预测/400/200');
+            }
+            
+            function openAboutWindow() {
+                fetch('/api/open_window/about/关于/400/400');
+            }
+            
+            function openHelp() {
+                fetch('/api/open_help')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('无法打开帮助文件: ' + data.error);
+                        }
+                    });
+            }
+
+            function openLogConsole() {
+                fetch('/api/open_log_console')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('无法打开日志控制台: ' + data.error);
+                        }
+                    });
+            }
+            
+            // 启动按钮点击事件
+            document.getElementById('start-button').addEventListener('click', function() {
+                if (!isTitrationRunning) {
+                    startTitration();
+                } else {
+                    stopTitration();
+                }
+            });
+            
+            // 初始化系统时间
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+            
+            // 开始状态更新循环
+            updateStatus();
+            statusUpdateInterval = setInterval(updateStatus, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>大模型预测</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/style.css') }}">
+</head>
+<body>
+    <div class="config-container">
+        <div class="config-section">
+            <div class="config-row">
+                <div class="config-label">实验体系：</div>
+                <input type="text" class="config-input" id="exptype" value="">
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <!--<button class="config-button" id="cancel-button">取消</button>-->
+            <button class="config-button" id="ok-button">应用</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 取消按钮点击事件
+            //document.getElementById('cancel-button').addEventListener('click', function() {
+                //window.close();
+            //});
+            
+            // 确定按钮点击事件
+            document.getElementById('ok-button').addEventListener('click', function() {
+                const expType = document.getElementById('exptype').value;
+
+                // 保存配置到服务器
+                fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'exptype': expType
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.close();
+                    } else {
+                        alert('保存失败: ' + (data.error || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    alert('保存失败: ' + error);
+                });
+            });
+        })
+    </script>
+</body>
+</html>

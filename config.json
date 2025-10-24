@@ -1,0 +1,10 @@
+{
+    "rate": "06.00",
+    "threshold": 13,
+    "cap_num": 0,
+    "port": "COM1",
+    "usemask": false,
+    "threshold_times": 1,
+    "api_key": "",
+    "req_url": ""
+}

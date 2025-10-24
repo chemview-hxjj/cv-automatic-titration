@@ -1,0 +1,8 @@
+Flask==3.1.2
+pywebview==6.0
+numpy==2.2.6
+opencv-python==4.12.0.88
+requests==2.32.5
+pyserial==3.5
+plyer==2.1.0
+PyMsgBox==2.0.1
