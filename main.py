@@ -178,7 +178,7 @@ class Webview:
         @self.app.route('/api/open_log_console')
         def open_log_console():
             try:
-                console_file = 'logconsole.exe'
+                console_file = 'cat.log'
                 if os.path.exists(console_file):
                     os.startfile(console_file)
                 return jsonify({'success': True})
@@ -283,3 +283,4 @@ if __name__=='__main__':
     except Exception as e:
 
         print(f'错误：{e}')
+
