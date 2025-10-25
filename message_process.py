@@ -1,14 +1,14 @@
 # 化学笺集自动化滴定项目的一部分，用于实现消息提醒及日志记录
 # 作者：李峙德
 # 邮箱：contact@chemview.net
-# 最后更新：2025-10-23
+# 最后更新：2025-10-25
 # send wa 等待 cs 硬件连接就绪 ce 硬件连接错误 te 滴定过程错误 se 停止错误 re 润洗错误 le 释放错误 i* 初始化平均颜色 f* 终点平均颜色 me 大模型预测错误
 # alert ep 滴定终点 rs 取样区域太小
 # log et 终点判定条件 ef 恢复原色 ri 润洗 rl 释放 pr 大模型预测 gc 配置已保存 ve 视频流生成错误 ar API返回配置 cw 创建窗口错误 ms 手动停止
 # box ru 正在滴定
 import time
 import pymsgbox
-from plyer import notification
+import plyer
 
 class MessageProcessor:
 
@@ -41,7 +41,7 @@ class MessageProcessor:
                      've':'VIDEOGENERATEERROR', 
                      'ar':'APIRETURNEDCONFIG', 
                      'cw':'CREATWINDOWERROR',
-                     'ms':'MANUALLYSTOP', 
+                     'ms':'STOP', 
                      'av':'INITIALAVRANGEHSVCOLOR', 
                      'ig':'INITIALRANGE', 
                      'rs':'ROIRANGETOOSMALL', 
@@ -60,33 +60,31 @@ class MessageProcessor:
 
     def alert(self, msg, d=''):
         try:
+            self.log(msg, d)
             if d:
                 pymsgbox.alert(text=f'{self.alertmsg[msg]}：{d}', title='化学笺集自动化滴定项目')
             else:
                 pymsgbox.alert(text=self.alertmsg[msg], title='化学笺集自动化滴定项目')
-            self.log(msg, d)
         except Exception as e:
             print(e)
 
     def box(self, msg, d=''):
         try:
+            self.log(msg, d)
             if d:
-                notification.notify(
+                plyer.notification.notify(
                     title='化学笺集自动化滴定项目',
                     message=f'{self.boxmsg[msg]}：{d}',
                     app_name="化学笺集自动化滴定项目",
                     timeout=3,
-                    app_icon = "logo.ico",
                 )
             else:
-                notification.notify(
+                plyer.notification.notify(
                     title='化学笺集自动化滴定项目',
                     message=self.boxmsg[msg],
                     app_name="化学笺集自动化滴定项目",
                     timeout=3,
-                    app_icon = "logo.ico",
                 )
-            self.log(msg, d)
         except Exception as e:
             print(e)
 

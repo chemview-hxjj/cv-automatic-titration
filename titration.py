@@ -1,9 +1,9 @@
 # 化学笺集自动化滴定项目的一部分，用于实现颜色识别及相关功能
 # 作者：李峙德，刘一弘
 # 邮箱：contact@chemview.net
-# 最后更新：2025-10-24
+# 最后更新：2025-10-25
 import cv2
-from collections import deque
+import collections
 import time
 import threading
 import numpy as np
@@ -21,9 +21,9 @@ class ColorDetect:
         self.r_reference_hsv=None
         self.threshold=threshold
         self.threshold_times=threshold_times
-        self.h_h=deque(maxlen=sequence_length)
-        self.s_h=deque(maxlen=sequence_length)
-        self.v_h=deque(maxlen=sequence_length)
+        self.h_h=collections.deque(maxlen=sequence_length)
+        self.s_h=collections.deque(maxlen=sequence_length)
+        self.v_h=collections.deque(maxlen=sequence_length)
         self.l_current_hsv=None
         self.m_current_hsv=None
         self.r_current_hsv=None
@@ -171,7 +171,6 @@ class Titration:
             self.cd.proc.frame=self.cap.get_frame()
             self.cd.proc.usemask=self.usemask
             self.mp.send('cs')
-            time.sleep(1)
             self.preview()
         except Exception as e:
             self.mp.send('ce',f'{e}')
@@ -286,14 +285,13 @@ class Titration:
     def stop(self):
         try:
             self.pump.stop()
-            self.running = False
+            self.running=False
             self.endpoint=False
             self.pump.setrate(self.rate)
             self.volume=0
             self.time=0
             self.timer_normal.reset()
             self.timer_elapsed.reset()
-            time.sleep(0.1)
             self.ispreview=True
             self.preview()
             self.mp.log('ms')
@@ -321,8 +319,16 @@ class Titration:
 
     def release(self):
         try:
-            self.stop()
+            self.pump.stop()
+            self.running=False
+            self.endpoint=False
+            self.pump.setrate(self.rate)
+            self.volume=0
+            self.time=0
+            self.timer_normal.reset()
+            self.timer_elapsed.reset()
             self.pump.release()
+            self.ispreview=True
             self.mp.log('rl')
         except Exception as e:
             self.mp.send('le',f'{e}')
