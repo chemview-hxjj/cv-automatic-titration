@@ -17,13 +17,13 @@ class MessageProcessor:
         self.webmsg={'wa':'等待', 'cs':'就绪', 'ce':'硬件连接错误', 'te':'滴定过程错误', 'se':'停止错误', 're':'润洗错误', 'le':'释放错误', 'me':'大模型预测错误'}
         self.alertmsg={'ep':'到达滴定终点！消耗滴定液体积', 'rs':'取样区域太小，请重新选择！'}
         self.boxmsg={'ru':'正在滴定...'}
-        self.logmsg={'wa':'WATING', 
+        self.logmsg={'wa':'WAITING', 
                      'cs':'READY', 
                      'ce':'HWCONNECTIONERROR', 
                      'te':'TITRATIONERROR', 
                      'se':'STOPERROR', 
                      're':'RINSEERROR', 
-                     'le':'REALEASEERROR', 
+                     'le':'RELEASEERROR', 
                      'ep':'ENDPOINTVOLUME', 
                      'ru':'RUNTITRATION',  
                      'et':'NEARENDPOINT', 
@@ -42,7 +42,7 @@ class MessageProcessor:
                      'ar':'APIRETURNEDCONFIG', 
                      'cw':'CREATWINDOWERROR',
                      'ms':'STOP', 
-                     'av':'INITIALAVRANGEHSVCOLOR', 
+                     'av':'INITIALAVERAGEHSVCOLOR', 
                      'ig':'INITIALRANGE', 
                      'rs':'ROIRANGETOOSMALL', 
                      'pe':'PREVIEWERROR', 

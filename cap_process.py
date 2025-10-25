@@ -46,7 +46,7 @@ class HSVProcessor:
         self.sample_roi = None
         self.hsv_lower = np.array([0, 0, 0])
         self.hsv_upper = np.array([179, 255, 255])
-        self.frame = None
+        self.frame=None
         self.frame_copy=None
         self.usemask=True
         self.left_avg = None

@@ -227,7 +227,7 @@ class Titration:
                 frame_copy=self.cd.proc.show_frame_window()
 
                 if is_color_changed:
-                    if self.timer_normal.started and last_elapsed:
+                    if self.timer_normal.started:
                         if safe_pump_operation('stop'):
                             pump_stopped = True
 
@@ -256,10 +256,9 @@ class Titration:
 
                 else:
                     if self.timer_elapsed.started and not self.timer_elapsed.paused:
-                        last_elapsed = self.timer_elapsed.time_dict['elapsed']
+                        self.mp.log('ef')
                         self.timer_elapsed.pause()
                         self.endpoint = False
-                        self.mp.log('ef')
                         self.timer_elapsed.reset()
 
                     if pump_stopped:
@@ -284,6 +283,7 @@ class Titration:
 
     def stop(self):
         try:
+            self.mp.log('ms')
             self.pump.stop()
             self.running=False
             self.endpoint=False
@@ -294,7 +294,6 @@ class Titration:
             self.timer_elapsed.reset()
             self.ispreview=True
             self.preview()
-            self.mp.log('ms')
         except Exception as e:
             self.mp.send('se',f'{e}')
 
@@ -319,22 +318,23 @@ class Titration:
 
     def release(self):
         try:
+            self.mp.log('rl')
             self.pump.stop()
             self.running=False
             self.endpoint=False
             self.pump.setrate(self.rate)
             self.volume=0
             self.time=0
-            self.timer_normal.reset()
-            self.timer_elapsed.reset()
             self.pump.release()
             self.ispreview=True
-            self.mp.log('rl')
+            self.timer_normal.reset()
+            self.timer_elapsed.reset()
         except Exception as e:
             self.mp.send('le',f'{e}')
 
     def llm_predict(self,exptype):
         try:
+            self.mp.log('pr')
             predict_color=ds_connect.llm_get_color(exptype)
             self.predict_color=predict_color
             def hex_to_hsv(hex_color):
@@ -348,6 +348,5 @@ class Titration:
                 return [h, s, v]
             predict_hsv=hex_to_hsv(predict_color)
             self.predict_hsv=predict_hsv
-            self.mp.log('pr')
         except Exception as e:
             self.mp.send('me',f'{e}')
