@@ -1,4 +1,4 @@
-**主页: https://itsp.chemview.net/cat/en.html**
+**主页: https://itsp.chemview.net/cat**
 
 **Github仓库: https://github.com/chemview-hxjj/cv-automatic-titration**
 
